@@ -1,4 +1,5 @@
 # Cybersecurity Mini-Lab
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/9cb633b6-cd02-46c3-be4d-4d63e22f18ae" />
 
 A single-file web app to demo three security concepts:
 

@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cybersecurity Mini-Lab</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface-muted: #f1f5f9;
+      --border: #d0d7e2;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #2563eb;
+      --accent-strong: #1d4ed8;
+      --accent-soft: rgba(37,99,235,0.1);
+      --shadow: 0 12px 30px rgba(15,23,42,0.08);
+      --radius: 16px;
+      --warning: #dc2626;
+      --warning-soft: rgba(220,38,38,0.12);
+      --success: #059669;
+      --success-soft: rgba(5,150,105,0.12);
+      --badge: #1e293b;
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0f172a;
+      --surface: #16213c;
+      --surface-muted: #1f2a44;
+      --border: #273149;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #60a5fa;
+      --accent-strong: #3b82f6;
+      --accent-soft: rgba(96,165,250,0.18);
+      --shadow: 0 16px 50px rgba(2,6,23,0.7);
+      --warning: #f87171;
+      --warning-soft: rgba(248,113,113,0.18);
+      --success: #34d399;
+      --success-soft: rgba(52,211,153,0.18);
+      --badge: #cbd5f5;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    a {
+      color: inherit;
+    }
+    button, input, textarea {
+      font: inherit;
+      color: inherit;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      background: var(--accent);
+      color: white;
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      font-weight: 600;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    button:hover {
+      background: var(--accent-strong);
+      transform: translateY(-1px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button.secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+    button.secondary:hover {
+      background: var(--accent-soft);
+    }
+    button.link {
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      padding: 0;
+      font-weight: 600;
+    }
+    button.link:hover {
+      text-decoration: underline;
+      transform: none;
+    }
+    input[type="checkbox"] {
+      accent-color: var(--accent);
+    }
+    input, textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-muted);
+      padding: 0.7rem 0.85rem;
+      transition: border 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      resize: vertical;
+      min-height: 2.75rem;
+    }
+    textarea {
+      min-height: 7rem;
+    }
+    input:focus-visible, textarea:focus-visible {
+      outline: 3px solid var(--accent-soft);
+      box-shadow: 0 0 0 2px var(--accent);
+      border-color: var(--accent);
+      background: var(--surface);
+    }
+    button:focus-visible {
+      outline: 3px solid var(--accent-soft);
+      outline-offset: 2px;
+    }
+    .site-header {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .site-header-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 2vw + 1rem, 2.2rem);
+    }
+    .tagline {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .toggle {
+      position: relative;
+      width: 48px;
+      height: 24px;
+      background: var(--surface-muted);
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      transition: background 0.3s ease, border 0.3s ease;
+    }
+    .toggle::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 50%;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+    #theme-toggle:checked + .toggle::after {
+      transform: translateX(24px);
+    }
+    #theme-toggle:checked + .toggle {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+    .tabs {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto 1rem;
+      padding: 0 1rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    [role="tab"] {
+      flex: 1 1 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: inherit;
+      font-weight: 600;
+      text-align: center;
+      transition: background 0.2s ease, border 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+    [role="tab"][aria-selected="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+      transform: translateY(-1px);
+    }
+    [role="tab"]:hover {
+      border-color: var(--accent);
+    }
+    main.container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 1rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .panel {
+      display: none;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      padding: clamp(1.2rem, 1.5vw + 1rem, 2rem);
+    }
+    .panel.active {
+      display: block;
+    }
+    .panel h2 {
+      margin-top: 0;
+      font-size: 1.3rem;
+    }
+    .help-text {
+      margin: 0.35rem 0 1.2rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    .password-grid {
+      display: grid;
+      gap: 1rem;
+    }
+    .password-input-group {
+      display: grid;
+      gap: 0.65rem;
+    }
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .input-row button {
+      flex-shrink: 0;
+    }
+    .input-control {
+      flex: 1 1 240px;
+    }
+    .strength-card {
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface-muted);
+      padding: 1rem;
+      display: grid;
+      gap: 0.75rem;
+    }
+    .strength-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .strength-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--border);
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      width: 20%;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    .strength-fill.very-weak {
+      background: #ef4444;
+    }
+    .strength-fill.weak {
+      background: #f97316;
+    }
+    .strength-fill.fair {
+      background: #f59e0b;
+    }
+    .strength-fill.strong {
+      background: #22c55e;
+    }
+    .strength-fill.very-strong {
+      background: #0ea5e9;
+    }
+    .metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.95rem;
+    }
+    .metrics span {
+      background: var(--surface);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .issues {
+      margin: 0;
+      padding-left: 1.2rem;
+      display: grid;
+      gap: 0.35rem;
+      font-size: 0.95rem;
+    }
+    .alert {
+      margin-top: 0.5rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      background: var(--warning-soft);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+      font-size: 0.95rem;
+    }
+    .status-message {
+      margin-top: 0.5rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      min-height: 1.2rem;
+    }
+    .hash-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    .hash-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .hash-output {
+      background: var(--surface-muted);
+      border-radius: 10px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      font-family: "Courier New", Courier, monospace;
+      word-break: break-all;
+      font-size: 0.9rem;
+      min-height: 3.6rem;
+      display: flex;
+      align-items: center;
+    }
+    .hash-note {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      background: var(--surface-muted);
+      color: var(--badge);
+      border: 1px solid var(--border);
+    }
+    .badge.success {
+      background: var(--success-soft);
+      color: var(--success);
+      border-color: var(--success);
+    }
+    .badge.danger {
+      background: var(--warning-soft);
+      color: var(--warning);
+      border-color: var(--warning);
+    }
+    .split {
+      display: grid;
+      gap: 1rem;
+    }
+    .split.two {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .preview-card {
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface-muted);
+      padding: 1rem;
+      display: grid;
+      gap: 0.65rem;
+      min-height: 150px;
+    }
+    .preview-card strong {
+      font-size: 0.95rem;
+    }
+    .raw-warning {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      color: var(--warning);
+      background: var(--warning-soft);
+      border: 1px solid var(--warning);
+      border-radius: 999px;
+      padding: 0.35rem 0.75rem;
+      font-weight: 600;
+    }
+    .preview-surface {
+      border-radius: 10px;
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      padding: 0.75rem;
+      min-height: 90px;
+      overflow-wrap: break-word;
+    }
+    .what-happened {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-muted);
+      padding: 1rem;
+      font-size: 0.95rem;
+    }
+    .what-happened ul {
+      margin: 0.5rem 0 0;
+      padding-left: 1.2rem;
+      display: grid;
+      gap: 0.35rem;
+    }
+    footer {
+      margin-top: auto;
+      padding: 1.5rem 1rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    @media (min-width: 640px) {
+      [role="tab"] {
+        flex: 1 1 200px;
+      }
+      .password-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .password-grid .strength-card {
+        grid-column: span 2;
+      }
+    }
+    @media (min-width: 900px) {
+      .password-grid {
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      }
+      .password-grid .strength-card {
+        grid-column: unset;
+      }
+      .hash-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 599px) {
+      .site-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="site-header-row">
+      <div>
+        <h1>Cybersecurity Mini-Lab</h1>
+        <p class="tagline">Explore password strength, hashing, and XSS safety from one page.</p>
+      </div>
+      <div class="theme-toggle">
+        <label for="theme-toggle">Dark mode</label>
+        <input type="checkbox" id="theme-toggle" aria-label="Toggle dark theme" hidden>
+        <span class="toggle" aria-hidden="true"></span>
+      </div>
+    </div>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="Cybersecurity tools">
+    <button id="tab-password" role="tab" aria-controls="panel-password" aria-selected="true">Password Strength</button>
+    <button id="tab-hash" role="tab" aria-controls="panel-hash" aria-selected="false" tabindex="-1">Hash Demo (SHA-256)</button>
+    <button id="tab-xss" role="tab" aria-controls="panel-xss" aria-selected="false" tabindex="-1">Safe XSS Sandbox</button>
+  </nav>
+  <main class="container" role="main">
+    <section id="panel-password" class="panel active" role="tabpanel" aria-labelledby="tab-password" tabindex="0">
+      <h2>Password Strength Checker</h2>
+      <p class="help-text">Assess how resilient a password is, get actionable tips, and generate strong alternatives.</p>
+      <div class="password-grid">
+        <div class="password-input-group">
+          <label for="password-input">Password</label>
+          <div class="input-row">
+            <div class="input-control">
+              <input id="password-input" type="password" autocomplete="new-password" placeholder="Enter a password to analyze">
+            </div>
+            <button id="toggle-password-visibility" class="secondary" type="button" aria-pressed="false">Show</button>
+            <button id="copy-password" class="secondary" type="button">Copy</button>
+          </div>
+          <label for="password-confirm">Confirm password</label>
+          <input id="password-confirm" type="password" autocomplete="new-password" placeholder="Re-enter to check for mismatch">
+          <div class="input-row">
+            <button id="generate-password" type="button">Generate strong password</button>
+          </div>
+          <div id="confirm-message" class="alert" hidden aria-live="polite"></div>
+          <div id="copy-message" class="status-message" aria-live="polite"></div>
+        </div>
+        <div class="strength-card">
+          <div class="strength-heading">
+            <span id="strength-label">Very Weak</span>
+            <span id="strength-indicator" role="img" aria-label="Password strength: Very Weak">Level 1 of 5</span>
+          </div>
+          <div class="strength-track">
+            <div id="strength-fill" class="strength-fill very-weak" style="width:20%;"></div>
+          </div>
+          <div class="metrics">
+            <span id="entropy-output">Entropy: 0 bits</span>
+            <span id="charset-output">Character set: 0</span>
+          </div>
+          <div id="issues-wrap">
+            <ul id="issues-list" class="issues">
+              <li>Start typing to see suggestions.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="panel-hash" class="panel" role="tabpanel" aria-labelledby="tab-hash" tabindex="-1" hidden>
+      <h2>Hash Demo (SHA-256)</h2>
+      <p class="help-text">Hash any text locally with SHA-256, compare outputs, and copy results for experiments.</p>
+      <div class="hash-note">Uses Web Crypto SubtleCrypto SHA-256 in your browser.</div>
+      <div class="hash-grid">
+        <div>
+          <label for="hash-input-a">Input A</label>
+          <textarea id="hash-input-a" placeholder="Type or paste text for Input A"></textarea>
+          <div class="hash-output" id="hash-output-a" data-hash=""></div>
+        </div>
+        <div>
+          <label for="hash-input-b">Input B</label>
+          <textarea id="hash-input-b" placeholder="Type or paste text for Input B"></textarea>
+          <div class="hash-output" id="hash-output-b" data-hash=""></div>
+        </div>
+      </div>
+      <div class="hash-controls">
+        <button id="hash-a" type="button">Hash A</button>
+        <button id="hash-b" type="button">Hash B</button>
+        <button id="hash-compare" class="secondary" type="button">Compare A vs B</button>
+        <button id="hash-copy" class="secondary" type="button">Copy Hash</button>
+      </div>
+      <div class="status-message" id="hash-status" aria-live="polite"></div>
+      <div class="status-message">
+        <span id="hash-compare-badge" class="badge" hidden></span>
+      </div>
+    </section>
+    <section id="panel-xss" class="panel" role="tabpanel" aria-labelledby="tab-xss" tabindex="-1" hidden>
+      <h2>Safe XSS Sandbox</h2>
+      <p class="help-text">Compare unsafe HTML injection with safe encoding to understand cross-site scripting risks.</p>
+      <label for="xss-input">Try entering markup, such as &lt;h1&gt;Hello&lt;/h1&gt; or &lt;a href="javascript:alert('js')"&gt;link&lt;/a&gt;</label>
+      <textarea id="xss-input" placeholder="Type any HTML snippet to render both ways"></textarea>
+      <div class="split two">
+        <div class="preview-card">
+          <span class="raw-warning">Warning: raw HTML below</span>
+          <div class="preview-surface" id="raw-preview" aria-label="Raw HTML preview"></div>
+        </div>
+        <div class="preview-card">
+          <strong>Escaped output</strong>
+          <div class="preview-surface" id="safe-preview" aria-label="Escaped HTML preview"></div>
+        </div>
+      </div>
+      <div class="what-happened">
+        <strong>What happened?</strong>
+        <ul>
+          <li><strong>Raw:</strong> HTML is interpreted; scripts/styles could execute.</li>
+          <li><strong>Escaped:</strong> HTML is shown as text; no execution.</li>
+        </ul>
+      </div>
+      <div class="input-row">
+        <button id="xss-reset" class="secondary" type="button">Reset</button>
+      </div>
+    </section>
+  </main>
+  <footer role="contentinfo">
+    Cybersecurity Mini-Lab - Built for hands-on security practice.
+  </footer>
+  <script>
+    (() => {
+      const storageKeys = {
+        theme: "cyberlab-theme",
+        tab: "cyberlab-active-tab"
+      };
+      const root = document.documentElement;
+
+      function init() {
+        initThemeToggle();
+        initTabs();
+        initPasswordTool();
+        initHashDemo();
+        initXssSandbox();
+      }
+
+      // function initThemeToggle() {
+      //   const toggle = document.getElementById("theme-toggle");
+      //   const stored = localStorage.getItem(storageKeys.theme);
+      //   const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      //   const initial = stored || (prefersDark ? "dark" : "light");
+      //   applyTheme(initial);
+      //   toggle.checked = initial === "dark";
+      //   toggle.addEventListener("change", () => {
+      //     const nextTheme = toggle.checked ? "dark" : "light";
+      //     applyTheme(nextTheme);
+      //   });
+      // }
+      function initThemeToggle() {
+  const toggle = document.getElementById("theme-toggle");
+  const stored = localStorage.getItem(storageKeys.theme);
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const initial = stored || (prefersDark ? "dark" : "light");
+  applyTheme(initial);
+  toggle.checked = initial === "dark";
+  toggle.addEventListener("change", () => {
+    const nextTheme = toggle.checked ? "dark" : "light";
+    applyTheme(nextTheme);
+  });
+
+  // NEW: clicking the visual switch flips the hidden checkbox
+  const pill = document.querySelector(".toggle");
+  pill.addEventListener("click", () => {
+    toggle.checked = !toggle.checked;
+    toggle.dispatchEvent(new Event("change"));
+  });
+}
+
+
+      function applyTheme(theme) {
+        root.dataset.theme = theme;
+        localStorage.setItem(storageKeys.theme, theme);
+      }
+
+      function initTabs() {
+        const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+        const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+        let activeId = localStorage.getItem(storageKeys.tab);
+        if (!tabs.some(tab => tab.id === activeId)) {
+          activeId = tabs[0].id;
+        }
+        setActiveTab(activeId, false);
+
+        tabs.forEach(tab => {
+          tab.addEventListener("click", () => setActiveTab(tab.id, true));
+          tab.addEventListener("keydown", handleTabKeydown);
+        });
+
+        function setActiveTab(id, focusPanel) {
+          tabs.forEach(tab => {
+            const selected = tab.id === id;
+            tab.setAttribute("aria-selected", String(selected));
+            tab.tabIndex = selected ? 0 : -1;
+          });
+          panels.forEach(panel => {
+            const show = panel.getAttribute("aria-labelledby") === id;
+            panel.classList.toggle("active", show);
+            if (show) {
+              panel.removeAttribute("hidden");
+              panel.tabIndex = 0;
+              if (focusPanel) {
+                panel.focus();
+              }
+            } else {
+              panel.setAttribute("hidden", "");
+              panel.tabIndex = -1;
+            }
+          });
+          localStorage.setItem(storageKeys.tab, id);
+        }
+
+        function handleTabKeydown(event) {
+          const currentIndex = tabs.indexOf(document.activeElement);
+          if (currentIndex === -1) {
+            return;
+          }
+          if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+            event.preventDefault();
+            const next = tabs[(currentIndex + 1) % tabs.length];
+            next.focus();
+          } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+            event.preventDefault();
+            const prev = tabs[(currentIndex - 1 + tabs.length) % tabs.length];
+            prev.focus();
+          } else if (event.key === "Home") {
+            event.preventDefault();
+            tabs[0].focus();
+          } else if (event.key === "End") {
+            event.preventDefault();
+            tabs[tabs.length - 1].focus();
+          } else if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setActiveTab(document.activeElement.id, true);
+          }
+        }
+      }
+
+      function initPasswordTool() {
+        const passwordInput = document.getElementById("password-input");
+        const confirmInput = document.getElementById("password-confirm");
+        const toggleButton = document.getElementById("toggle-password-visibility");
+        const generateButton = document.getElementById("generate-password");
+        const copyButton = document.getElementById("copy-password");
+        const strengthLabel = document.getElementById("strength-label");
+        const strengthIndicator = document.getElementById("strength-indicator");
+        const strengthFill = document.getElementById("strength-fill");
+        const entropyOutput = document.getElementById("entropy-output");
+        const charsetOutput = document.getElementById("charset-output");
+        const issuesList = document.getElementById("issues-list");
+        const confirmMessage = document.getElementById("confirm-message");
+        const copyMessage = document.getElementById("copy-message");
+
+        const issueTemplates = {
+          length: "Increase length to at least 12 characters.",
+          lowercase: "Add lowercase letters for variety.",
+          uppercase: "Include uppercase letters.",
+          digits: "Add digits to broaden the character set.",
+          symbols: "Include symbols for higher complexity.",
+          spaces: "Spaces can help create natural passphrases.",
+          dictionary: "Avoid common dictionary words or cliches.",
+          sequences: "Avoid predictable sequences like abcd or 1234.",
+          repeats: "Avoid repeated patterns or characters.",
+          keyboard: "Avoid keyboard rows such as qwerty or asdf.",
+          dates: "Avoid using dates or years tied to you.",
+          personal: "Skip personal info like birthdays; mix unrelated words.",
+          passphrase: "Use an unrelated-word passphrase to boost memorability and entropy."
+        };
+
+        passwordInput.addEventListener("input", updateState);
+        confirmInput.addEventListener("input", updateState);
+
+        toggleButton.addEventListener("click", () => {
+          const reveal = passwordInput.type === "password";
+          const nextType = reveal ? "text" : "password";
+          passwordInput.type = nextType;
+          confirmInput.type = nextType;
+          toggleButton.setAttribute("aria-pressed", String(reveal));
+          toggleButton.textContent = reveal ? "Hide" : "Show";
+        });
+
+        generateButton.addEventListener("click", () => {
+          const generated = generateStrongPassword();
+          passwordInput.type = "password";
+          confirmInput.type = "password";
+          toggleButton.setAttribute("aria-pressed", "false");
+          toggleButton.textContent = "Show";
+          passwordInput.value = generated;
+          confirmInput.value = generated;
+          copyMessage.textContent = "New strong password generated.";
+          updateState();
+          passwordInput.focus();
+          passwordInput.setSelectionRange(0, generated.length);
+        });
+
+        copyButton.addEventListener("click", async () => {
+          const value = passwordInput.value;
+          if (!value) {
+            copyMessage.textContent = "Enter or generate a password before copying.";
+            return;
+          }
+          if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            copyMessage.textContent = "Clipboard API unavailable in this browser.";
+            return;
+          }
+          try {
+            await navigator.clipboard.writeText(value);
+            copyMessage.textContent = "Password copied to clipboard.";
+          } catch (error) {
+            copyMessage.textContent = "Clipboard permissions blocked.";
+          }
+        });
+
+        updateState();
+
+        function updateState() {
+          const password = passwordInput.value || "";
+          const confirm = confirmInput.value || "";
+
+          const charsetInfo = estimateCharset(password);
+          const entropy = password.length && charsetInfo.size
+            ? password.length * Math.log2(charsetInfo.size)
+            : 0;
+          entropyOutput.textContent = `Entropy: ${Math.round(entropy)} bits`;
+          charsetOutput.textContent = `Character set: ${charsetInfo.size}`;
+
+          const level = determineStrengthLevel(entropy);
+          strengthLabel.textContent = level.label;
+          strengthIndicator.textContent = `Level ${level.index} of 5`;
+          strengthIndicator.setAttribute("aria-label", `Password strength: ${level.label}`);
+          strengthFill.className = `strength-fill ${level.className}`;
+          strengthFill.style.width = `${level.index * 20}%`;
+
+          const issues = new Set();
+          if (password && password.length < 12) {
+            issues.add(issueTemplates.length);
+          }
+          if (!charsetInfo.classes.lowercase) {
+            issues.add(issueTemplates.lowercase);
+          }
+          if (!charsetInfo.classes.uppercase) {
+            issues.add(issueTemplates.uppercase);
+          }
+          if (!charsetInfo.classes.digits) {
+            issues.add(issueTemplates.digits);
+          }
+          if (!charsetInfo.classes.symbols) {
+            issues.add(issueTemplates.symbols);
+          }
+          if (password && !charsetInfo.classes.spaces) {
+            issues.add(issueTemplates.spaces);
+          }
+
+          const lowerPassword = password.toLowerCase();
+
+          if (containsDictionaryWord(lowerPassword)) {
+            issues.add(issueTemplates.dictionary);
+          }
+          if (hasSequentialPattern(lowerPassword)) {
+            issues.add(issueTemplates.sequences);
+          }
+          if (hasRepeatedPattern(lowerPassword)) {
+            issues.add(issueTemplates.repeats);
+          }
+          if (hasKeyboardPattern(lowerPassword)) {
+            issues.add(issueTemplates.keyboard);
+          }
+          if (looksLikeDate(password)) {
+            issues.add(issueTemplates.dates);
+          }
+
+          if (password && password.length < 16) {
+            issues.add(issueTemplates.passphrase);
+          }
+          if (password && issues.size) {
+            issues.add(issueTemplates.personal);
+          }
+
+          renderIssues(Array.from(issues));
+
+          if (confirm && password !== confirm) {
+            confirmMessage.textContent = "Passwords do not match.";
+            confirmMessage.hidden = false;
+          } else {
+            confirmMessage.textContent = "";
+            confirmMessage.hidden = true;
+          }
+        }
+
+        function renderIssues(entries) {
+          issuesList.innerHTML = "";
+          if (!entries.length) {
+            const li = document.createElement("li");
+            li.textContent = "No major issues detected. Keep passphrases memorable and unique.";
+            issuesList.appendChild(li);
+            return;
+          }
+          entries.slice(0, 6).forEach(text => {
+            const li = document.createElement("li");
+            li.textContent = text;
+            issuesList.appendChild(li);
+          });
+        }
+      }
+
+      function estimateCharset(password) {
+        const classes = {
+          lowercase: /[a-z]/.test(password),
+          uppercase: /[A-Z]/.test(password),
+          digits: /[0-9]/.test(password),
+          symbols: /[!@#$%^&*()\-_=+\[\]{};:'",.<>\/?\\|]/.test(password),
+          spaces: / /.test(password)
+        };
+        let size = 0;
+        if (classes.lowercase) size += 26;
+        if (classes.uppercase) size += 26;
+        if (classes.digits) size += 10;
+        if (classes.symbols) size += 32;
+        if (classes.spaces) size += 1;
+        return { size, classes };
+      }
+
+      function determineStrengthLevel(entropy) {
+        const levels = [
+          { label: "Very Weak", className: "very-weak", index: 1, threshold: 28 },
+          { label: "Weak", className: "weak", index: 2, threshold: 36 },
+          { label: "Fair", className: "fair", index: 3, threshold: 60 },
+          { label: "Strong", className: "strong", index: 4, threshold: 80 },
+          { label: "Very Strong", className: "very-strong", index: 5, threshold: Infinity }
+        ];
+        for (const level of levels) {
+          if (entropy < level.threshold) {
+            return level;
+          }
+        }
+        return levels[levels.length - 1];
+      }
+
+      function containsDictionaryWord(password) {
+        if (!password) return false;
+        const dictionary = ["password", "letmein", "admin", "welcome", "iloveyou", "123456", "111111", "qwerty", "dragon"];
+        return dictionary.some(word => password.includes(word));
+      }
+
+      function hasSequentialPattern(password) {
+        if (password.length < 4) return false;
+        const sequences = ["abcdefghijklmnopqrstuvwxyz", "qwertyuiop", "asdfghjkl", "zxcvbnm", "0123456789"];
+        return sequences.some(sequence => {
+          for (let i = 0; i <= sequence.length - 4; i++) {
+            const chunk = sequence.slice(i, i + 4);
+            if (password.includes(chunk)) {
+              return true;
+            }
+            const reversed = chunk.split("").reverse().join("");
+            if (password.includes(reversed)) {
+              return true;
+            }
+          }
+          return false;
+        });
+      }
+
+      function hasRepeatedPattern(password) {
+        return /(.{2,})\1+/i.test(password) || /(.)\1{2,}/i.test(password);
+      }
+
+      function hasKeyboardPattern(password) {
+        const patterns = ["qwerty", "asdf", "zxcv", "!@#$", "12345", "09876"];
+        return patterns.some(pattern => password.includes(pattern));
+      }
+
+     function looksLikeDate(password) {
+  const year = /\b(19|20)\d{2}\b/;
+  // dd/mm/yy, dd-mm-yyyy, dd.mm.yy etc. (same separator enforced via backreference)
+  const dmy = /\b\d{2}([\/.\-])\d{2}\1\d{2,4}\b/;
+  return year.test(password) || dmy.test(password);
+}
+
+      function generateStrongPassword() {
+        const lower = "abcdefghijkmnopqrstuvwxyz";
+        const upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+        const digits = "23456789";
+        const symbols = "!@#$%^&*()-_=+[]{};:,.<>/?";
+        const groups = [lower, upper, digits, symbols];
+        const allChars = groups.join("");
+        const length = 12 + Math.floor(Math.random() * 9);
+        const result = [];
+        const required = groups.map(group => group.charAt(cryptoRandom(group.length)));
+        required.forEach(char => result.push(char));
+        while (result.length < length) {
+          result.push(allChars.charAt(cryptoRandom(allChars.length)));
+        }
+        for (let i = result.length - 1; i > 0; i--) {
+          const j = cryptoRandom(i + 1);
+          [result[i], result[j]] = [result[j], result[i]];
+        }
+        return result.join("");
+      }
+
+      function cryptoRandom(max) {
+        const array = new Uint32Array(1);
+        window.crypto.getRandomValues(array);
+        return Math.floor(array[0] / (0xffffffff + 1) * max);
+      }
+
+      function initHashDemo() {
+        const inputA = document.getElementById("hash-input-a");
+        const inputB = document.getElementById("hash-input-b");
+        const outputA = document.getElementById("hash-output-a");
+        const outputB = document.getElementById("hash-output-b");
+        const hashAButton = document.getElementById("hash-a");
+        const hashBButton = document.getElementById("hash-b");
+        const compareButton = document.getElementById("hash-compare");
+        const copyButton = document.getElementById("hash-copy");
+        const status = document.getElementById("hash-status");
+        const badge = document.getElementById("hash-compare-badge");
+        let lastTarget = null;
+
+        hashAButton.addEventListener("click", async () => {
+          if (!inputA.value) {
+            status.textContent = "Input A is empty.";
+            return;
+          }
+          const hash = await digestText(inputA.value);
+          outputA.textContent = hash;
+          outputA.dataset.hash = hash;
+          lastTarget = outputA;
+          badge.hidden = true;
+          status.textContent = "Hash A ready.";
+        });
+
+        hashBButton.addEventListener("click", async () => {
+          if (!inputB.value) {
+            status.textContent = "Input B is empty.";
+            return;
+          }
+          const hash = await digestText(inputB.value);
+          outputB.textContent = hash;
+          outputB.dataset.hash = hash;
+          lastTarget = outputB;
+          badge.hidden = true;
+          status.textContent = "Hash B ready.";
+        });
+
+        compareButton.addEventListener("click", async () => {
+          if (!inputA.value || !inputB.value) {
+            status.textContent = "Provide text in both inputs before comparing.";
+            return;
+          }
+          const [hashA, hashB] = await Promise.all([digestText(inputA.value), digestText(inputB.value)]);
+          outputA.textContent = hashA;
+          outputB.textContent = hashB;
+          outputA.dataset.hash = hashA;
+          outputB.dataset.hash = hashB;
+          lastTarget = outputB;
+          if (hashA === hashB) {
+            badge.textContent = "Equal";
+            badge.className = "badge success";
+          } else {
+            badge.textContent = "Not equal";
+            badge.className = "badge danger";
+          }
+          badge.hidden = false;
+          status.textContent = "Hashes computed and compared.";
+        });
+
+        copyButton.addEventListener("click", async () => {
+          if (!lastTarget || !lastTarget.dataset.hash) {
+            status.textContent = "Hash a value before copying.";
+            return;
+          }
+          if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            status.textContent = "Clipboard API unavailable in this browser.";
+            return;
+          }
+          try {
+            await navigator.clipboard.writeText(lastTarget.dataset.hash);
+            status.textContent = "Hash copied to clipboard.";
+          } catch (error) {
+            status.textContent = "Clipboard permissions blocked.";
+          }
+        });
+      }
+
+      async function digestText(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
+        return bufferToHex(hashBuffer);
+      }
+
+      function bufferToHex(buffer) {
+        const bytes = new Uint8Array(buffer);
+        const hexCodes = Array.from(bytes, byte => byte.toString(16).padStart(2, "0"));
+        return hexCodes.join("");
+      }
+
+      function initXssSandbox() {
+        const input = document.getElementById("xss-input");
+        const raw = document.getElementById("raw-preview");
+        const safe = document.getElementById("safe-preview");
+        const reset = document.getElementById("xss-reset");
+
+        const render = () => {
+          const value = input.value;
+          raw.innerHTML = value;
+          safe.textContent = value;
+        };
+
+        input.addEventListener("input", render);
+        reset.addEventListener("click", () => {
+          input.value = "";
+          raw.innerHTML = "";
+          safe.textContent = "";
+          input.focus();
+        });
+
+        render();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
+

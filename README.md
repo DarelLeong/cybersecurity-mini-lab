@@ -8,5 +8,3 @@ A single-file web app to demo three security concepts:
 
 **Tech**: Plain HTML/CSS/JS, no libraries. Accessible tabs, keyboard support, light/dark theme (stored in `localStorage`).
 
-## Live Demo (GitHub Pages)
-After enabling GitHub Pages (see below), your app will be her
